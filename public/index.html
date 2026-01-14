@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <title>Travianer</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="icon" type="image/x-icon" href="res/">
+</head>
+<body>
+
+<div id="game-wrapper">
+    <div id="gameDiv">
+        <canvas id="gameCanvas" width="1000" height="600"></canvas>
+
+        <div id="bottom-bar-bg-layer"></div>
+
+        <div id="interfaceDiv2">
+            <div id="div2ContentTab">
+                <div id="resourcesTab" style="background-image: url('res/ui/interface_right_top_res.gif'); background-repeat: no-repeat;">
+                    <div id="storageCount">Speicher: <span id="storageCountNumber">300</span></div>
+                    <div class="res leftRes resNr1">120</div>
+                    <div class="res leftRes resNr2">85</div>
+                    <div class="res leftRes resNr3">40</div>
+                    <div class="res leftRes resNr4">200</div>
+                    <div class="res leftRes resNr5">10</div>
+                    <div class="res rightRes resNr1">5</div>
+                    <div class="res rightRes resNr2">0</div>
+                    <div class="res rightRes resNr3">0</div>
+                    <div class="res rightRes resNr4">0</div>
+                    <div class="res rightRes resNr5">0</div>
+                </div>
+            </div>
+        </div>
+
+        <div id="interfaceDiv3" class="chatSizeSmall">
+            <div id="div3Content">
+                <div id="chatDivContainer"><div id="chatDiv"></div></div>
+                <input type="text" id="chatInput" class="text">
+                <div id="mainMenuButtons">
+                    <div id="btn_inventory" class="btn"></div>
+                    <div id="btn_messages" class="btn"></div>
+                    <div id="btn_friends" class="btn"></div>
+                    <div id="btn_settings" class="btn"></div>
+                </div>
+            </div>
+        </div>
+
+        <div id="moneyCount">1500</div>
+        <div id="diaCount">25</div>
+        <div id="SPCount">100</div>
+        <div id="rolloverLockButton"></div>
+
+    </div> 
+</div>
+
+<script src="js/config.js"></script>
+<script src="js/assets.js"></script>
+<script src="js/camera.js"></script>
+<script src="js/pathfinding.js"></script>
+<script src="js/player.js"></script>
+<script src="js/game.js"></script>
+
+</body>
+</html>

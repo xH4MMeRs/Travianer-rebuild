@@ -1,0 +1,129 @@
+// js/pathfinding.js
+
+const GRID_SIZE = 7; // Halbe Strichstärke deines 14px Pinstels für maximale Sicherheit
+
+const maskCanvas = document.createElement('canvas');
+const maskCtx = maskCanvas.getContext('2d', { willReadFrequently: true });
+maskCanvas.width = TILE_W;
+maskCanvas.height = TILE_H;
+
+let lastMaskId = null;
+
+function isPositionWalkable(x, y) {
+    const tx = Math.floor(x / TILE_W);
+    const ty = Math.floor(y / TILE_H);
+    if (!walkableSet.has(`${tx},${ty}`)) return false;
+
+    const mask = getMaskImage(tx, ty);
+    if (mask.exists && mask.ready) {
+        const localX = Math.floor(x % TILE_W);
+        const localY = Math.floor(y % TILE_H);
+        
+        const currentMaskId = `${tx},${ty}`;
+        if (lastMaskId !== currentMaskId) {
+            maskCtx.clearRect(0, 0, TILE_W, TILE_H);
+            maskCtx.drawImage(mask.img, 0, 0);
+            lastMaskId = currentMaskId;
+        }
+        
+        const imageData = maskCtx.getImageData(localX, localY, 1, 1).data;
+        return imageData[0] > 128; // Pfad ist Weiß
+    }
+    return !mask.exists; 
+}
+
+function calculatePath(startX, startY, endX, endY) {
+    const startNode = { x: Math.round(startX / GRID_SIZE), y: Math.round(startY / GRID_SIZE) };
+    const endNode = { x: Math.round(endX / GRID_SIZE), y: Math.round(endY / GRID_SIZE) };
+
+    if (!isPositionWalkable(endX, endY)) return null;
+
+    let openList = [startNode];
+    let closedList = new Set();
+    let parentMap = new Map();
+    
+    startNode.g = 0;
+    startNode.f = getDistance(startNode, endNode);
+
+    // Erhöht auf 3000, da das 7px Gitter viel mehr Knoten hat
+    const maxIterations = 3000; 
+    let iterations = 0;
+
+    while (openList.length > 0 && iterations < maxIterations) {
+        iterations++;
+        
+        let currentIndex = 0;
+        for (let i = 0; i < openList.length; i++) {
+            if (openList[i].f < openList[currentIndex].f) currentIndex = i;
+        }
+        let current = openList[currentIndex];
+
+        if (current.x === endNode.x && current.y === endNode.y) {
+            return reconstructPath(parentMap, current);
+        }
+
+        openList.splice(currentIndex, 1);
+        closedList.add(`${current.x},${current.y}`);
+
+        const neighbors = [
+            { x: current.x + 1, y: current.y }, { x: current.x - 1, y: current.y },
+            { x: current.x, y: current.y + 1 }, { x: current.x, y: current.y - 1 }
+        ];
+
+        for (let neighbor of neighbors) {
+            const neighborKey = `${neighbor.x},${neighbor.y}`;
+            if (closedList.has(neighborKey)) continue;
+
+            if (!isPositionWalkable(neighbor.x * GRID_SIZE, neighbor.y * GRID_SIZE)) {
+                closedList.add(neighborKey);
+                continue;
+            }
+
+            let tentativeG = current.g + 1;
+            let neighborInOpen = openList.find(n => n.x === neighbor.x && n.y === neighbor.y);
+
+            if (!neighborInOpen || tentativeG < neighbor.g) {
+                neighbor.g = tentativeG;
+                neighbor.f = neighbor.g + getDistance(neighbor, endNode);
+                parentMap.set(neighborKey, current);
+                if (!neighborInOpen) openList.push(neighbor);
+            }
+        }
+    }
+    return null; 
+}
+
+function getDistance(a, b) {
+    return Math.abs(a.x - b.x) + Math.abs(a.y - b.y);
+}
+
+function reconstructPath(parentMap, current) {
+    const path = [];
+    while (current) {
+        let worldX = current.x * GRID_SIZE;
+        let worldY = current.y * GRID_SIZE;
+
+        // --- Zentrierungs-Logik ---
+        // Wir tasten kurz nach links und rechts ab, um die Mitte der 14px zu finden
+        let leftEdge = worldX;
+        let rightEdge = worldX;
+
+        // Suche linke Kante der weißen Linie (max 10px weit)
+        for (let i = 0; i < 10; i++) {
+            if (isPositionWalkable(worldX - i, worldY)) leftEdge = worldX - i;
+            else break;
+        }
+        // Suche rechte Kante
+        for (let i = 0; i < 10; i++) {
+            if (isPositionWalkable(worldX + i, worldY)) rightEdge = worldX + i;
+            else break;
+        }
+
+        // Der neue X-Wert ist exakt die Mitte zwischen den Kanten
+        let centeredX = (leftEdge + rightEdge) / 2;
+
+        path.push({ x: centeredX, y: worldY });
+        current = parentMap.get(`${current.x},${current.y}`);
+    }
+    return path.reverse(); 
+}

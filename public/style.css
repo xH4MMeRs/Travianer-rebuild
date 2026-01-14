@@ -1,0 +1,107 @@
+/*Travernia*/
+
+/* travians.css */
+html{
+    height:100%;
+}
+
+body {
+    background-color: #000000;
+    margin: 0;
+    padding: 0;
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    justify-content: center; /* Horizontal mittig */
+    align-items: center;     /* Vertikal mittig */
+    overflow: hidden;
+    font-family: Verdana, Arial, Helvetica, sans-serif;
+    font-size: 13px;
+    font-weight: normal;
+    text-align: left;
+    color: #000000;
+}
+
+#game-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100vw;
+    height: 850px;
+        
+    /* Hintergrund hier definieren statt im body */
+    background-image: url('res/bg/gameborder/defaultBorder_de.jpg');
+    background-repeat: no-repeat;
+    background-position: center center;
+    background-size: cover;
+}
+
+#gameDiv {
+    width: 1000px;
+    height: 600px;
+    background-color: #AAAAAA;
+    overflow: hidden;
+    position: relative;
+    z-index: 10;
+    margin-top: -26px;
+    margin-left: -1px;
+    /* Verhindert, dass der Inhalt beim Zoomen im Div springt */
+    flex-shrink: 0; 
+    }
+
+    div#diaCount{
+        position:absolute;
+        top:575px;
+        left:31px;
+        width:70px;
+        z-index:96;
+        text-align:right;
+        color:#fff;
+    }
+    
+    div#diaCount:hover{
+        cursor: pointer;
+    }
+
+    div#diaCount:active{
+        cursor: pointer;
+    }
+    
+    .res {
+        font-size:12px;
+        color:#000
+    }
+
+    div#gameDiv div#apCount{
+        margin-left:26px;
+    }
+    
+    div#SPCount{
+        position:absolute;
+        top:575px;
+        left:120px;
+        width:118px;
+        z-index:91;
+        text-align:right;
+        color:#fff;
+    }
+
+    div#SPCountWrapper{
+        width:118px;
+        float: right;
+        position: relative;
+    }
+
+    div#gameDiv img#nextBPImg{
+        position:absolute;
+        top:530px;
+        left:77px;
+        z-index:91;
+    }
+    
+    div#gameDiv div#rolloverLockButton{
+        position:absolute;
+        top:574px;
+        left:3px;
+        z-index:91;
+    }
