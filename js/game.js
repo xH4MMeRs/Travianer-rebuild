@@ -16,14 +16,11 @@ function draw(timestamp) {
     updateMovement(dt);
     updateCamera(player.worldX, player.worldY, canvas.width, canvas.height, dt);
     
-    // Animation-Timer
-    if (player.isMoving) {
-        if (timestamp - player.lastFrameUpdate > 100) { 
-            player.currentFrame = (player.currentFrame + 1) % 10;
-            player.lastFrameUpdate = timestamp;
-        }
-    } else {
-        player.currentFrame = 0;
+    // --- NEU: Kontinuierlicher Animation-Timer ---
+    // Der Frame schaltet jetzt IMMER weiter, egal ob Bewegung oder Stand
+    if (timestamp - player.lastFrameUpdate > 120) { // 120ms für ein gemütliches Tempo
+        player.currentFrame = (player.currentFrame + 1) % 10;
+        player.lastFrameUpdate = timestamp;
     }
 
     // 2. Zeichnen vorbereiten
@@ -60,12 +57,15 @@ function draw(timestamp) {
     ctx.ellipse(sX, sY + 22, 10, 5, 0, 0, Math.PI * 2);
     ctx.fill();
 
-    // Sprite
-    let img = player.isMoving ? player.imgWalk : player.imgStand;
+    // Sprite-Auswahl basierend auf Bewegung
+    const isActuallyMoving = player.isMoving && (Math.abs(player.vx) > 0.1 || Math.abs(player.vy) > 0.1);
+    let img = isActuallyMoving ? player.imgWalk : player.imgStand;
+    
     ctx.save();
     if (player.direction === 'left') {
         ctx.translate(sX, sY); 
         ctx.scale(-1, 1);
+        // Nutzt den durchlaufenden currentFrame für beide Animationen
         ctx.drawImage(img, player.currentFrame * 50, 0, 50, 50, -25, -25, 50, 50);
     } else {
         ctx.drawImage(img, player.currentFrame * 50, 0, 50, 50, sX - 25, sY - 25, 50, 50);
@@ -73,10 +73,8 @@ function draw(timestamp) {
     ctx.restore();
 
     // --- SCHICHT 3: Vordergrund (Layer 2) ---
-    // Wir loopen nochmal über die sichtbaren Tiles für die Überdeckung
     for (let x = viewX - 2; x <= viewX + 4; x++) {
         for (let y = viewY - 2; y <= viewY + 4; y++) {
-            // Wir brauchen eine Funktion getLayer2Image in deiner assets.js
             const tileL2 = getLayer2Image(x, y); 
             if (tileL2 && tileL2.exists && tileL2.ready) {
                 ctx.drawImage(
